@@ -17,15 +17,16 @@ SOURCES += main.cpp \
 
 OTHER_FILES += \
     Test.qml \
-    Loading.qml
+    Loading.qml \
+    ajax-loader.gif
 
 HEADERS += \
     gamesystem.h
 
-win32:CONFIG(release, debug|release): LIBS += -L$$PWD/../OgreSDK_vc10_v1-7-4/lib/release/ -lOgreMain
-else:win32:CONFIG(debug, debug|release): LIBS += -L$$PWD/../OgreSDK_vc10_v1-7-4/lib/debug/ -lOgreMain_d
+win32:CONFIG(release, debug|release): LIBS += -L$$PWD/../../OgreSDK_vc10_v1-7-4/lib/release/ -lOgreMain
+else:win32:CONFIG(debug, debug|release): LIBS += -L$$PWD/../../OgreSDK_vc10_v1-7-4/lib/debug/ -lOgreMain_d
 
-win32:LIBS += -L$$PWD/../OgreSDK_vc10_v1-7-4/boost_1_47/lib/
+win32:LIBS += -L$$PWD/../../OgreSDK_vc10_v1-7-4/boost_1_47/lib/
 
-INCLUDEPATH += $$PWD/../OgreSDK_vc10_v1-7-4/include/Ogre $$PWD/../OgreSDK_vc10_v1-7-4/boost_1_47
-DEPENDPATH += $$PWD/../OgreSDK_vc10_v1-7-4/include/Ogre
+INCLUDEPATH += $$PWD/../../OgreSDK_vc10_v1-7-4/include/Ogre $$PWD/../../OgreSDK_vc10_v1-7-4/boost_1_47
+DEPENDPATH += $$PWD/../../OgreSDK_vc10_v1-7-4/include/Ogre

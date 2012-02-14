@@ -54,11 +54,6 @@ int main(int argc, char *argv[])
     mPluginsCfg = "plugins.cfg";
 #endif
 
-    QImage logo;
-    if (!logo.load("logo.png")) {
-        qFatal("Unable to load logo.png.");
-    }
-
     QQuickView *view = new UpdateableQuickView();
     view->show();
 
@@ -85,102 +80,35 @@ int main(int argc, char *argv[])
     if (!engine->globalObject().hasOwnProperty("myObj")) {
         qDebug() << "Obj is copied...";
     }*/
-    Ogre::SceneManager *mSceneMgr;
-    bool ogreInitialized = false;
 
-    a.processEvents(QEventLoop::AllEvents);
+    // construct Ogre::Root
+    mRoot = new Ogre::Root(mPluginsCfg);
 
-    view->openglContext()->makeCurrent(view);
-    auto ctxId = wglGetCurrentContext();
+    Ogre::ConfigFile cf;
+    cf.load(mResourcesCfg);
 
-    QFuture<bool> initResult = QtConcurrent::run([&]() -> bool {
+    // Go through all sections & settings in the file
+    Ogre::ConfigFile::SectionIterator seci = cf.getSectionIterator();
 
-        // construct Ogre::Root
-        mRoot = new Ogre::Root(mPluginsCfg);
-
-        Ogre::ConfigFile cf;
-        cf.load(mResourcesCfg);
-
-        // Go through all sections & settings in the file
-        Ogre::ConfigFile::SectionIterator seci = cf.getSectionIterator();
-
-        Ogre::String secName, typeName, archName;
-        while (seci.hasMoreElements())
+    Ogre::String secName, typeName, archName;
+    while (seci.hasMoreElements())
+    {
+        secName = seci.peekNextKey();
+        Ogre::ConfigFile::SettingsMultiMap *settings = seci.getNext();
+        Ogre::ConfigFile::SettingsMultiMap::iterator i;
+        for (i = settings->begin(); i != settings->end(); ++i)
         {
-            secName = seci.peekNextKey();
-            Ogre::ConfigFile::SettingsMultiMap *settings = seci.getNext();
-            Ogre::ConfigFile::SettingsMultiMap::iterator i;
-            for (i = settings->begin(); i != settings->end(); ++i)
-            {
-                typeName = i->first;
-                archName = i->second;
-                Ogre::ResourceGroupManager::getSingleton().addResourceLocation(
-                    archName, typeName, secName);
-            }
+            typeName = i->first;
+            archName = i->second;
+            Ogre::ResourceGroupManager::getSingleton().addResourceLocation(
+                archName, typeName, secName);
         }
+    }
 
-
-        if(!(mRoot->restoreConfig() || mRoot->showConfigDialog()))
-        {
-            return false;
-        }
-
-        qDebug() << "Using OpenGL Context ID: " << ctxId;
-        qDebug() << "Using HWND: " << view->winId();
-
-        mRoot->initialise(false);
-
-        Ogre::NameValuePairList params;
-        params["externalWindowHandle"] = Ogre::StringConverter::toString((unsigned int)view->winId());
-        params["externalGLControl"] = Ogre::StringConverter::toString( (true) );
-        params["externalGLContext"] = Ogre::StringConverter::toString( (ctxId) );
-        auto mWindow = mRoot->createRenderWindow( "", view->width(), view->height(), false, &params );
-
-        // initialise all resource groups
-        Ogre::ResourceGroupManager::getSingleton().initialiseAllResourceGroups();
-
-        // Create the SceneManager, in this case a generic one
-        mSceneMgr = mRoot->createSceneManager("DefaultSceneManager");
-
-        static Ogre::Camera* mCamera;
-        // Create the camera
-        mCamera = mSceneMgr->createCamera("PlayerCam");
-
-        // Position it at 80 in Z direction
-        mCamera->setPosition(Ogre::Vector3(0,0,80));
-        // Look back along -Z
-        mCamera->lookAt(Ogre::Vector3(0,0,-300));
-        mCamera->setNearClipDistance(5);
-
-        // Create one viewport, entire window
-        static Ogre::Viewport* vp = mWindow->addViewport(mCamera);
-        vp->setBackgroundColour(Ogre::ColourValue(0,0,0));
-
-        // Alter the camera aspect ratio to match the viewport
-        mCamera->setAspectRatio(
-            Ogre::Real(vp->getActualWidth()) / Ogre::Real(vp->getActualHeight()));
-
-        static Ogre::Entity* ogreHead = mSceneMgr->createEntity("Head", "ogrehead.mesh");
-        Ogre::SceneNode* headNode = mSceneMgr->getRootSceneNode()->createChildSceneNode();
-        headNode->attachObject(ogreHead);
-
-        // Set ambient light
-        mSceneMgr->setAmbientLight(Ogre::ColourValue(0.5, 0.5, 0.5));
-
-        // Create a light
-        Ogre::Light* l = mSceneMgr->createLight("MainLight");
-        l->setPosition(20,80,50);
-
-        glPushClientAttrib(GL_CLIENT_ALL_ATTRIB_BITS);
-        glPushAttrib(GL_ALL_ATTRIB_BITS);
-
-        QMetaObject::invokeMethod(view, "setSource", Q_ARG(QUrl, QUrl("Test.qml")));
-
-        ogreInitialized = true;
-
-        return true;
-
-    });
+    if(!(mRoot->restoreConfig() || mRoot->showConfigDialog()))
+    {
+        return false;
+    }
 
     long frameCount = 0;
     QElapsedTimer lastUpdateTimer;
@@ -188,7 +116,7 @@ int main(int argc, char *argv[])
 
     QObject::connect(view, &QQuickView::beforeRendering, [=]() {
 
-        static bool initializedOgre = false;
+        static bool ogreInitialized = false;
 
         QOpenGLContext *ctx = QOpenGLContext::currentContext();
         ctx->functions()->glUseProgram(0);
@@ -225,29 +153,86 @@ int main(int argc, char *argv[])
         glPopMatrix();
         glMatrixMode(GL_MODELVIEW);
         glPopMatrix();*/
-        if (ogreInitialized) {
-            ctx->functions()->glBindBuffer(GL_ARRAY_BUFFER, 0);
-            ctx->functions()->glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
-            ctx->functions()->glBindFramebuffer(GL_FRAMEBUFFER, 0);
-            ctx->functions()->glBindRenderbuffer(GL_RENDERBUFFER, 0);
-            ctx->functions()->glUseProgram(0);
+        if (!ogreInitialized) {
 
-            glPopAttrib();
-            glPopClientAttrib();
 
-            mRoot->renderOneFrame();
+            auto ctxId = wglGetCurrentContext();
 
-            glPushClientAttrib(GL_CLIENT_ALL_ATTRIB_BITS);
-            glPushAttrib(GL_ALL_ATTRIB_BITS);
+        qDebug() << "Using OpenGL Context ID: " << ctxId;
+        qDebug() << "Using HWND: " << view->winId();
 
-            ctx->functions()->glBindBuffer(GL_ARRAY_BUFFER, 0);
-            ctx->functions()->glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+        mRoot->initialise(false);
 
-            ctx->functions()->glBindFramebuffer(GL_FRAMEBUFFER, 0);
-            ctx->functions()->glBindRenderbuffer(GL_RENDERBUFFER, 0);
-            ctx->functions()->glUseProgram(0);
-        }
+        Ogre::NameValuePairList params;
+        params["externalWindowHandle"] = Ogre::StringConverter::toString((unsigned int)view->winId());
+        params["externalGLControl"] = Ogre::StringConverter::toString( (true) );
+        params["externalGLContext"] = Ogre::StringConverter::toString( (ctxId) );
+        auto mWindow = mRoot->createRenderWindow( "", view->width(), view->height(), false, &params );
+
+        // initialise all resource groups
+        Ogre::ResourceGroupManager::getSingleton().initialiseAllResourceGroups();
+
+        // Create the SceneManager, in this case a generic one
+        static auto mSceneMgr = mRoot->createSceneManager("DefaultSceneManager");
+
+        static Ogre::Camera* mCamera;
+        // Create the camera
+        mCamera = mSceneMgr->createCamera("PlayerCam");
+
+        // Position it at 80 in Z direction
+        mCamera->setPosition(Ogre::Vector3(0,0,80));
+        // Look back along -Z
+        mCamera->lookAt(Ogre::Vector3(0,0,-300));
+        mCamera->setNearClipDistance(5);
+
+        // Create one viewport, entire window
+        static Ogre::Viewport* vp = mWindow->addViewport(mCamera);
+        vp->setBackgroundColour(Ogre::ColourValue(0,0,0));
+
+        // Alter the camera aspect ratio to match the viewport
+        mCamera->setAspectRatio(
+            Ogre::Real(vp->getActualWidth()) / Ogre::Real(vp->getActualHeight()));
+
+        static Ogre::Entity* ogreHead = mSceneMgr->createEntity("Head", "ogrehead.mesh");
+        Ogre::SceneNode* headNode = mSceneMgr->getRootSceneNode()->createChildSceneNode();
+        headNode->attachObject(ogreHead);
+
+        // Set ambient light
+        mSceneMgr->setAmbientLight(Ogre::ColourValue(0.5, 0.5, 0.5));
+
+        // Create a light
+        Ogre::Light* l = mSceneMgr->createLight("MainLight");
+        l->setPosition(20,80,50);
+
+        glPushClientAttrib(GL_CLIENT_ALL_ATTRIB_BITS);
+        glPushAttrib(GL_ALL_ATTRIB_BITS);
+
+        QMetaObject::invokeMethod(view, "setSource", Q_ARG(QUrl, QUrl("Test.qml")));
+}
+        ogreInitialized = true;
+
+        ctx->functions()->glBindBuffer(GL_ARRAY_BUFFER, 0);
+        ctx->functions()->glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+
+        ctx->functions()->glBindFramebuffer(GL_FRAMEBUFFER, 0);
+        ctx->functions()->glBindRenderbuffer(GL_RENDERBUFFER, 0);
+        ctx->functions()->glUseProgram(0);
+
+        glPopAttrib();
+        glPopClientAttrib();
+
+        mRoot->renderOneFrame();
+
+        glPushClientAttrib(GL_CLIENT_ALL_ATTRIB_BITS);
+        glPushAttrib(GL_ALL_ATTRIB_BITS);
+
+        ctx->functions()->glBindBuffer(GL_ARRAY_BUFFER, 0);
+        ctx->functions()->glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+
+        ctx->functions()->glBindFramebuffer(GL_FRAMEBUFFER, 0);
+        ctx->functions()->glBindRenderbuffer(GL_RENDERBUFFER, 0);
+        ctx->functions()->glUseProgram(0);
     });
 
     QObject::connect(view, &QQuickCanvas::afterRendering, [=]() mutable  {
