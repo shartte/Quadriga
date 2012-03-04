@@ -122,7 +122,18 @@ public:
         AlphaAdd
     };
 
-    TroikaMaterialDefinition();
+    TroikaMaterialDefinition() :
+            mDisableFaceCulling(false),
+            mDisableLighting(false),
+            mDisableDepthTest(false),
+            mDisableDepthWrite(false),
+            mLinearFiltering(false),
+            mBlendType(Alpha),
+            mRecalculateNormals(false),
+            mSpecularPower(50),
+            mColor(255, 255, 255, 255)
+    {
+    }
 
     static const int MaxTextureStages = 3;
 

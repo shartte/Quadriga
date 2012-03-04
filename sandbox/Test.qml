@@ -17,6 +17,12 @@ Rectangle {
         anchors.left: parent.left
     }
 
+    TextEdit {
+        id: text_edit1
+        font.pixelSize: 12
+        anchors.fill: parent
+    }
+
     Component.onCompleted: {
         myObj.callMethod("Test text");
     }

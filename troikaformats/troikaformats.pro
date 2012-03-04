@@ -2,7 +2,8 @@
 QT       -= gui
 
 TARGET = TroikaFormats
-TEMPLATE = static_lib
+TEMPLATE = lib
+CONFIG += staticlib
 
 DEFINES += TROIKAFORMATS_LIBRARY
 
@@ -11,13 +12,13 @@ HEADERS += \
     include/troikaformats/materialdefinition.h \
     src/stable.h \
     include/troikaformats/archive.h \
-    include/troikaformats/color.h
+    include/troikaformats/color.h \
+    src/materialcommand.h
 
 INCLUDEPATH += include/
 
 SOURCES += \
     src/materialfile.cpp \
-    src/materialdefinition.cpp \
     src/archive.cpp
 
 PRECOMPILED_HEADER = src/stable.h
