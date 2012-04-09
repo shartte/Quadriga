@@ -171,24 +171,48 @@ public:
         return mDisableFaceCulling;
     }
 
+    void setFaceCullingDisabled(bool faceCullingDisabled) {
+        mDisableFaceCulling = faceCullingDisabled;
+    }
+
     bool isLightingDisabled() const {
         return mDisableLighting;
+    }
+
+    void setLightingDisabled(bool lightingDisabled) {
+        mDisableLighting = lightingDisabled;
     }
 
     bool isDepthTestDisabled() const {
         return mDisableDepthTest;
     }
 
+    void setDepthTestDisabled(bool disabled) {
+        mDisableDepthTest = disabled;
+    }
+
     bool isLinearFiltering() const {
         return mLinearFiltering;
+    }
+
+    void setLinearFiltering(bool linearFiltering) {
+        mLinearFiltering = linearFiltering;
     }
 
     bool isDepthWriteDisabled() const {
         return mDisableDepthWrite;
     }
 
+    void setDepthWriteDisabled(bool depthWriteDisabled) {
+        mDisableDepthWrite = depthWriteDisabled;
+    }
+
     const TroikaColor &color() const {
         return mColor;
+    }
+
+    void setColor(const TroikaColor &color) {
+        mColor = color;
     }
 
     const TroikaTextureStageInfo &textureStage(int stage) const {
@@ -205,13 +229,26 @@ public:
         return mSpecularPower;
     }
 
-    const QString &glossmap() const {
-        return mGlossmap;
+    void setSpecularPower(float specularPower) {
+        mSpecularPower = specularPower;
+    }
+
+    const QString &glossMap() const {
+        return mGlossMap;
+    }
+
+    void setGlossMap(const QString &glossMap) {
+        mGlossMap = glossMap;
     }
 
     bool isRecalculateNormals() const {
         return mRecalculateNormals;
     }
+
+    void setRecalculateNormals(bool recalculateNormals) {
+        mRecalculateNormals = recalculateNormals;
+    }
+
 private:
     QString mName;
     Type mType;
@@ -226,7 +263,7 @@ private:
     bool mRecalculateNormals;
     float mSpecularPower;
     TroikaColor mColor;
-    QString mGlossmap;
+    QString mGlossMap;
 };
 
 #endif // MATERIALDEFINITION_H

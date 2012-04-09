@@ -1,0 +1,7 @@
+<RCC>
+    <qresource prefix="/">
+        <file>scripts/buffer.js</file>
+        <file>scripts/util.js</file>
+        <file>scripts/assert.js</file>
+    </qresource>
+</RCC>

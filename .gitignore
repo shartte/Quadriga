@@ -1,0 +1,8 @@
+*.pdb
+debug
+release
+Makefile
+Makefile.*
+*.pro.user
+*.pro.*
+*.log
