@@ -29,7 +29,6 @@ else:unix:!symbian: PRE_TARGETDEPS += $$OUT_PWD/../conversion/libconversion.a
 
 win32:CONFIG(release, debug|release): LIBS += -L$$OUT_PWD/../troikaformats/release/ -ltroikaformats
 else:win32:CONFIG(debug, debug|release): LIBS += -L$$OUT_PWD/../troikaformats/debug/ -ltroikaformats
-else:symbian: LIBS += -ltroikaformats
 else:unix: LIBS += -L$$OUT_PWD/../troikaformats/ -ltroikaformats
 
 INCLUDEPATH += $$PWD/../troikaformats/include
@@ -49,3 +48,9 @@ DEPENDPATH += $$PWD/../../scripting
 win32:CONFIG(release, debug|release): PRE_TARGETDEPS += $$OUT_PWD/../../scripting/release/scripting.lib
 else:win32:CONFIG(debug, debug|release): PRE_TARGETDEPS += $$OUT_PWD/../../scripting/debug/scripting.lib
 else:unix:!symbian: PRE_TARGETDEPS += $$OUT_PWD/../../scripting/libscripting.a
+
+OTHER_FILES += \
+    converter/startup.js \
+    converter/log.js \
+    converter/conversion.js \
+    converter/conversion/images.js

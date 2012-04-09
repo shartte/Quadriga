@@ -10,8 +10,8 @@
 
 #include "troikaformats/archive.h"
 
-QVfsModule::QVfsModule(QJSEngine *engine) :
-    QObject(engine), mEngine(engine)
+QVfsModule::QVfsModule(QCommonJSModule *commonJsModule) :
+    QObject(commonJsModule), mCommonJsModule(commonJsModule), mEngine(commonJsModule->engine())
 {
 }
 
@@ -132,9 +132,30 @@ QJSValue QVfsModule::readFile(const QString &path)
     foreach (TroikaArchive *archive, mArchives) {
         QByteArray content = archive->readFile(path);
         if (!content.isNull()) {
-            return QBufferModule::newBuffer(mEngine, content);
+            return QBufferModule::newBuffer(mCommonJsModule, content);
         }
     }
 
     return QJSValue();
+}
+
+QJSValue QVfsModule::listAllFiles(const QString &filenameFilter) const
+{
+    QSet<QString> paths;
+
+    foreach (TroikaArchive *archive, mArchives) {
+        auto entries = archive->listAllFiles(filenameFilter);
+        foreach (auto entry, entries) {
+            paths.insert(entry->fullPath());
+        }
+    }
+
+    QJSValue result = mEngine->newArray(paths.size());
+    int offset = 0;
+    foreach (const QString &path, paths) {
+        result.setProperty(offset++, QJSValue(path));
+    }
+
+    return result;
+
 }

@@ -9,14 +9,18 @@ QT       -= gui
 
 TARGET = conversion
 TEMPLATE = lib
-CONFIG += staticlib
+CONFIG += staticlib create_prl
 
 SOURCES += conversion.cpp \
-    qvfsmodule.cpp
+    qvfsmodule.cpp \
+    imagemodule.cpp \
+    conversionoutput.cpp
 
 HEADERS += conversion.h \
     stable.h \
-    qvfsmodule.h
+    qvfsmodule.h \
+    imagemodule.h \
+    conversionoutput.h
 
 PRECOMPILED_HEADER = stable.h
 

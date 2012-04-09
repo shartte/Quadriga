@@ -80,7 +80,7 @@ QJSValue QCommonJSModule::require(QString id)
 
         QString oldCurrentDir = mCurrentModuleDir;
         if (id.contains("/")) {
-            mCurrentModuleDir = id.left(id.lastIndexOf('/' + 1));
+            mCurrentModuleDir = id.left(id.lastIndexOf('/') + 1);
         } else {
             mCurrentModuleDir = "";
         }
@@ -102,8 +102,6 @@ QJSValue QCommonJSModule::require(QString id)
         mModuleCache[id] = module.property("exports");
 
         mCurrentModuleDir = oldCurrentDir; // TODO: Safe-guard this with a guard or something...
-    } else {
-        qDebug() << "Loading" << id << "from module cache.";
     }
 
     return mModuleCache[id];
@@ -115,6 +113,5 @@ QString QCommonJSModule::normalizeModuleId(const QString &id) const
         return id;
 
     QString normalizedId = QDir::cleanPath(mCurrentModuleDir + id);
-    qDebug() << "Normalized module id" << id << "to" << normalizedId;
     return normalizedId;
 }

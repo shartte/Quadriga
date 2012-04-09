@@ -23,6 +23,19 @@ struct TroikaArchiveEntry {
         return type == CompressedFile;
     }
 
+    QString fullPath() const {
+        QString result = QString::fromLocal8Bit(filename);
+
+        TroikaArchiveEntry *current = parent;
+        while (current) {
+            result.prepend(Separator);
+            result.prepend(QString::fromLocal8Bit(current->filename));
+            current = current->parent;
+        }
+
+        return result;
+    }
+
     static const char Separator = '/';
 
     Type type;

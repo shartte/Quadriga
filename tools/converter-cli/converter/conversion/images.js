@@ -1,24 +1,49 @@
 
 var vfs = require("vfs"),
     log = require("log"),
-    buffer = require("buffer");
+    buffer = require("buffer"),
+    image = require("image"),
+    output = require("./output");
+
+var tileSize = 256;
 
 function assembleImage(path) {
 
-    var slowBuffer = vfs.readFile(path);
-    var imgBuffer = new buffer.Buffer(slowBuffer, slowBuffer.length, 0);
+    // Strip extension
+    path = path.substr(0, path.length - 4);
 
-    console.log(imgBuffer.inspect());
+    var imgDeclBuffer = vfs.readFile(path + ".img"),
+        w = imgDeclBuffer.readInt16LE(0),
+        h = imgDeclBuffer.readInt16LE(2);
 
-    var w = imgBuffer.readInt16LE(0),
-        h = imgBuffer.readInt16LE(2);
-    log.info("Image " + path + ": " + w + ", " + h);
+    log.trace("Image {}: {}x{}", path, w, h);
+
+    var xTiles = Math.ceil(w / tileSize),
+        yTiles = Math.ceil(h / tileSize),
+        tiles = [],
+        imgBuffer;
+
+    for (var y = 0; y < yTiles; ++y) {
+        for (var x = 0; x < xTiles; ++x) {
+            imgBuffer = vfs.readFile(path + "_" + x + "_" + y + ".tga");
+            tiles.push(imgBuffer);
+        }
+    }
+
+    var result = image.convertTargasToPng(w, h, tiles);
+    output.addBuffer("images", path + ".png", result);
 }
 
 exports.run = function() {
 
     log.info("Starting image conversion...");
 
-    assembleImage("art/splash/legal0322.img");
+    var imageFiles = vfs.listAllFiles("*.img");
+
+    console.info("Found", imageFiles.length, "tiled images to convert.");
+
+    imageFiles.forEach(function (path) {
+        assembleImage(path);
+    });
 
 };

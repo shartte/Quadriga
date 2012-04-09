@@ -15,11 +15,12 @@
 #include "qstdlibmodule.h"
 #include "qworkermodule.h"
 
+#include "imagemodule.h"
 #include "qvfsmodule.h"
+#include "conversionoutput.h"
 
 int main(int argc, char *argv[])
 {
-
     qDebug() << "Testing CommonJS module...";
 
     QGuiApplication a(argc, argv);
@@ -44,7 +45,9 @@ int main(int argc, char *argv[])
 
     commonJsModule.addNativeModule("eventbus", eventBus);
     commonJsModule.addNativeModule("worker", workerModule);
-    commonJsModule.addNativeModule("vfs", new QVfsModule(quickView.engine()));
+    commonJsModule.addNativeModule("vfs", new QVfsModule(&commonJsModule));
+    commonJsModule.addNativeModule("image", new ImageModule(&commonJsModule));
+    commonJsModule.addNativeModule("conversion/output", new ConversionOutput(&commonJsModule));
 
     QJSValue startupModule = commonJsModule.require("startup");
     startupModule.property("startup").call(QJSValueList() << quickView.engine()->newQObject(rootItem));

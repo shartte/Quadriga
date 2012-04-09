@@ -15,11 +15,13 @@ HEADERS += \
     include/troikaformats/archiveentry.h \
     include/troikaformats/gamepathguesser.h \
     src/stable.h \
-    src/materialcommand.h
+    src/materialcommand.h \
+    include/troikaformats/targaimage.h
 
 SOURCES += \
     src/materialfile.cpp \
-    src/archive.cpp
+    src/archive.cpp \
+    src/targaimage.cpp
 
 win32:SOURCES += src/gamepathguesser_win32.cpp
 else:SOURCES += src/gamepathguesser.cpp

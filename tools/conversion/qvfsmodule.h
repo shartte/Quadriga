@@ -13,7 +13,7 @@ class QVfsModule : public QObject
 {
     Q_OBJECT
 public:
-    explicit QVfsModule(QJSEngine *engine);
+    explicit QVfsModule(QCommonJSModule *commonJs);
     ~QVfsModule();
         
 signals:
@@ -64,8 +64,14 @@ public slots:
       */
     QJSValue readFile(const QString &path);
 
+    /**
+      Returns a list of all files in the virtual file system, filtered using the given filename filter.
+      */
+    QJSValue listAllFiles(const QString &filenameFilter) const;
+
 private:
     QJSEngine *mEngine;
+    QCommonJSModule *mCommonJsModule;
 
     QList<TroikaArchive*> mArchives;
     QList<QDir> mDirectories;

@@ -28,11 +28,26 @@ void QBufferModule::install(QCommonJSModule *commonJsModule)
 
 }
 
-QJSValue QBufferModule::newBuffer(QJSEngine *engine, const QByteArray &data)
+QJSValue QBufferModule::newBuffer(QCommonJSModule *commonJsModule, const QByteArray &data)
 {
-    QV8Engine *v8Engine = QV8Engine::get(engine);
+    auto bufferModule = commonJsModule->require("buffer");
+    auto bufferConstructor = bufferModule.property("Buffer");
+
+    QV8Engine *v8Engine = QV8Engine::get(commonJsModule->engine());
 
     Buffer *buffer = Buffer::New(data.data(), data.size());
+    QJSValue slowBuffer = v8Engine->scriptValueFromInternal(buffer->handle_);
+    int len = Buffer::Length(buffer);
 
-    return v8Engine->scriptValueFromInternal(buffer->handle_);
+    return bufferConstructor.callAsConstructor(QJSValueList() << slowBuffer << len << QJSValue());
+}
+
+QByteArray QBufferModule::getData(const QJSValue &buffer)
+{
+    v8::Handle<v8::Object> bufferObject = *QJSValuePrivate::get(buffer);
+
+    int len = Buffer::Length(bufferObject);
+    char *data = Buffer::Data(bufferObject);
+
+    return QByteArray::fromRawData(data, len);
 }

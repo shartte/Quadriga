@@ -22,6 +22,22 @@ private:
     QElapsedTimer timer;
 };
 
+class WildcardMatcher {
+public:
+    WildcardMatcher(const QString &pattern) {
+        mPrefix = pattern.section('*', 0, 0);
+        mSuffix = pattern.section('*', 1);
+    }
+
+    bool operator()(const QString &path) const {
+        return path.startsWith(mPrefix, Qt::CaseInsensitive)
+                && path.endsWith(mSuffix, Qt::CaseInsensitive);
+    }
+private:
+    QString mPrefix;
+    QString mSuffix;
+};
+
 bool TroikaArchive::open(const QString &filename)
 {
     MethodTimer timer("Opened archive " + filename + " in ");
@@ -196,11 +212,15 @@ TroikaArchive::EntryList TroikaArchive::listAllFiles(const QString &filenameFilt
 {
     TroikaArchive::EntryList result;
 
+    WildcardMatcher matcher(filenameFilter);
+
     for (int i = 0; i < mEntries.size(); ++i) {
         const TroikaArchiveEntry *entry = mEntries.data() + i;
         if (entry->isDirectory())
             continue;
-        result.append(entry);
+
+        if (matcher(entry->filename))
+            result.append(entry);
     }
 
     return result;
