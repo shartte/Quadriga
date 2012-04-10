@@ -3,11 +3,22 @@ var vfs = require("vfs"),
     log = require("log"),
     buffer = require("buffer"),
     image = require("image"),
-    output = require("./output");
+    output = require("./output"),
+    util = require("./util");
 
 var tileSize = 256;
 
+var exclusions = [
+    'art/interface/PARTY_QUICKVIEW_UI/nav_background.img',
+    'art/interface/PARTY_QUICKVIEW_UI/background.img'
+];
+
 function assembleImage(path) {
+
+    if (exclusions.indexOf(path) !== -1) {
+        log.trace("Skipping {} because it is excluded.", path);
+        return; // Skip
+    }
 
     // Strip extension
     path = path.substr(0, path.length - 4);
@@ -21,17 +32,40 @@ function assembleImage(path) {
     var xTiles = Math.ceil(w / tileSize),
         yTiles = Math.ceil(h / tileSize),
         tiles = [],
-        imgBuffer;
+        imgBuffer,
+        filename;
 
     for (var y = 0; y < yTiles; ++y) {
         for (var x = 0; x < xTiles; ++x) {
-            imgBuffer = vfs.readFile(path + "_" + x + "_" + y + ".tga");
+            filename = path + "_" + x + "_" + y + ".tga";
+            exclusions.push(filename); /* Do not convert it a second time */
+            imgBuffer = vfs.readFile(filename);
             tiles.push(imgBuffer);
         }
     }
 
     var result = image.convertTargasToPng(w, h, tiles);
-    output.addBuffer("images", path + ".png", result);
+    output.addBuffer("interface", path + ".png", result);
+}
+
+function convertImage(path) {
+
+    if (exclusions.indexOf(path) !== -1)
+        return;
+
+    var imgBuffer = vfs.readFile(path),
+        pngBuffer,
+        newFilename = util.changeExtension(path, "png");
+
+    if (imgBuffer) {
+        pngBuffer = image.convertTargaToPng(imgBuffer);
+        if (pngBuffer) {
+            output.addBuffer("interface", newFilename, pngBuffer);
+        } else {
+            log.error("Failed to convert {}", path);
+        }
+    }
+
 }
 
 exports.run = function() {
@@ -40,10 +74,17 @@ exports.run = function() {
 
     var imageFiles = vfs.listAllFiles("*.img");
 
-    console.info("Found", imageFiles.length, "tiled images to convert.");
+    log.info("Found {} tiled images to convert.", imageFiles.length);
 
-    imageFiles.forEach(function (path) {
-        assembleImage(path);
+    imageFiles.forEach(assembleImage);
+
+    imageFiles = vfs.listAllFiles("*.tga");
+
+    imageFiles = imageFiles.filter(function (path) {
+        return path.indexOf("art/interface/") === 0;
     });
+
+    log.info("Found {} normal images to convert.", imageFiles.length);
+    imageFiles.forEach(convertImage);
 
 };

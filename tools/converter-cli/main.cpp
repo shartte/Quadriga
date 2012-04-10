@@ -25,13 +25,14 @@ int main(int argc, char *argv[])
 
     QGuiApplication a(argc, argv);
 
-    QQuickView quickView(QUrl("converter/gui/gui.qml"));
+    QQuickView quickView;
     quickView.engine()->setOutputWarningsToStandardError(true);
     quickView.setResizeMode(QQuickView::SizeRootObjectToView);
 
     // Install event bus
     QEventBus *eventBus = new QEventBus(&quickView);
     quickView.rootContext()->setContextProperty("eventbus", eventBus);
+    quickView.setSource(QUrl("converter/gui/gui.qml"));
     quickView.show();
 
     QQuickItem *rootItem = quickView.rootObject();

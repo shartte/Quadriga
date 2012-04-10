@@ -53,4 +53,10 @@ OTHER_FILES += \
     converter/startup.js \
     converter/log.js \
     converter/conversion.js \
-    converter/conversion/images.js
+    converter/conversion/images.js \
+    converter/gui/ProgressBar.qml \
+    converter/gui/PathChooser.qml \
+    converter/gui/gui.qml \
+    converter/gui/Conversion.qml \
+    converter/gui/Button.qml \
+    converter/conversion/util.js

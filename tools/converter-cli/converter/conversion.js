@@ -1,6 +1,5 @@
 
-var eventbus = require("eventbus"),
-    log = require("log"),
+var log = require("log"),
     vfs = require("vfs");
 
 exports.run = function(gamePath) {

@@ -57,15 +57,16 @@ Item {
     }
 
     Component.onCompleted: {
-        if (typeof eventbus !== "undefined") {
-            eventbus.subscribe("log", function (channel, message) {
-                logWindow.text += message.message;
-                console.log(message);
-            });
-            eventbus.subscribe("progress", function (channel, message) {
-                progressBar.progress = message.progress;
-            });
-        }
+        console.log("Subscribing to event bus.");
+        eventbus.subscribe("log", function (channel, message) {
+            console.log("Hey. Got a nice message!");
+            logWindow.text += message.message;
+            console.log(message);
+        });
+        eventbus.subscribe("progress", function (channel, message) {
+            progressBar.progress = message.progress;
+        });
+        console.log("Subscribed to event bus.");
     }
 
 }

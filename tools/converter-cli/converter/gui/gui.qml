@@ -52,6 +52,7 @@ Rectangle {
         guiRoot.state = state;
     }
 
+
     /*
     function addGuiItem(qmlUrl, creationCallback, properties) {
 
