@@ -17,7 +17,8 @@ SOURCES += \
     qworkermodule.cpp \
     qbuffermodule.cpp \
     v8_buffer.cpp \
-    qstdlibmodule.cpp
+    qstdlibmodule.cpp \
+    qschedulingmodule.cpp
 
 HEADERS += \
     qcommonjsmodule.h \
@@ -28,7 +29,8 @@ HEADERS += \
     v8_object_wrap.h \
     qstdlibmodule.h \
     qvfsmodule.h \
-    gamepathguesser.h
+    gamepathguesser.h \
+    qschedulingmodule.h
 
 unix {
     target.path = /usr/lib

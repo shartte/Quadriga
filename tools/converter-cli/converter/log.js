@@ -32,6 +32,19 @@ exports.info = function(message) {
 
 };
 
+exports.warn = function(message) {
+
+    message = parseMessage(message, arguments);
+
+    console.log("[WARN]", message);
+
+    eventbus.publish("log", {
+                         level: "warn",
+                         message: message
+                     });
+
+};
+
 exports.error = function(message) {
 
     message = parseMessage(message, arguments);

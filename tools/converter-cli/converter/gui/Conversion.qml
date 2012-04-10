@@ -53,14 +53,34 @@ Item {
         anchors.bottom: parent.bottom
         anchors.margins: 20
         color: "#dddddd"
-        text: "Status Information"
+        text: ""
+    }
+
+    function getLevel(level) {
+        var result = "<b>[";
+        switch (level) {
+        case "info":
+            result += "<font color=\"#ffffff\">INFO</font>";
+            break;
+        case "error":
+            result += "<font color=\"#ff0000\">ERROR</font>";
+            break;
+        case "warn":
+            result += "<font color=\"#cccc00\">WARN</font>";
+            break;
+        default:
+            result += message.level.toUpperCase();
+            break;
+        }
+        result += "]</b> ";
+        return result;
     }
 
     Component.onCompleted: {
         console.log("Subscribing to event bus.");
         eventbus.subscribe("log", function (channel, message) {
             console.log("Hey. Got a nice message!");
-            logWindow.text += message.message;
+            logWindow.text += getLevel(message.level) + message.message + "<br>";
             console.log(message);
         });
         eventbus.subscribe("progress", function (channel, message) {

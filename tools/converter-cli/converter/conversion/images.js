@@ -4,7 +4,8 @@ var vfs = require("vfs"),
     buffer = require("buffer"),
     image = require("image"),
     output = require("./output"),
-    util = require("./util");
+    util = require("./util"),
+    scheduling = require("scheduling");
 
 var tileSize = 256;
 
@@ -62,7 +63,7 @@ function convertImage(path) {
         if (pngBuffer) {
             output.addBuffer("interface", newFilename, pngBuffer);
         } else {
-            log.error("Failed to convert {}", path);
+            log.warn("Failed to convert {}", path);
         }
     }
 
@@ -76,7 +77,13 @@ exports.run = function() {
 
     log.info("Found {} tiled images to convert.", imageFiles.length);
 
-    imageFiles.forEach(assembleImage);
+    var executionPlan = [];
+
+    imageFiles.forEach(function(img) {
+        executionPlan.push(function() {
+            assembleImage(img);
+        });
+    });
 
     imageFiles = vfs.listAllFiles("*.tga");
 
@@ -85,6 +92,13 @@ exports.run = function() {
     });
 
     log.info("Found {} normal images to convert.", imageFiles.length);
-    imageFiles.forEach(convertImage);
+
+    imageFiles.forEach(function (path) {
+        executionPlan.push(function() {
+            convertImage(path);
+        });
+    });
+
+    scheduling.defer(executionPlan);
 
 };

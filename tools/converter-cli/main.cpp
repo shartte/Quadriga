@@ -14,6 +14,7 @@
 #include "qbuffermodule.h"
 #include "qstdlibmodule.h"
 #include "qworkermodule.h"
+#include "qschedulingmodule.h"
 
 #include "imagemodule.h"
 #include "qvfsmodule.h"
@@ -49,6 +50,7 @@ int main(int argc, char *argv[])
     commonJsModule.addNativeModule("vfs", new QVfsModule(&commonJsModule));
     commonJsModule.addNativeModule("image", new ImageModule(&commonJsModule));
     commonJsModule.addNativeModule("conversion/output", new ConversionOutput(&commonJsModule));
+    commonJsModule.addNativeModule("scheduling", new QSchedulingModule(quickView.engine()));
 
     QJSValue startupModule = commonJsModule.require("startup");
     startupModule.property("startup").call(QJSValueList() << quickView.engine()->newQObject(rootItem));

@@ -29,15 +29,7 @@ private:
 QWorkerModule::QWorkerModule(QJSEngine *engine) :
     QObject(engine), mEngine(engine), mLocker(new v8::Locker())
 {
-    qDebug() << "Locker is now" << v8::Locker::IsActive();
-    v8::Locker::StartPreemption(10);
-    qDebug() << "Started preemption";
-
-    QTimer *timer = new QTimer(this);
-    timer->setInterval(100);
-    timer->setSingleShot(false);
-    connect(timer, SIGNAL(timeout()), SLOT(yield()));
-    timer->start();
+    QMetaObject::invokeMethod(this, "yield", Qt::QueuedConnection);
 }
 
 QWorkerModule::~QWorkerModule()
@@ -56,6 +48,8 @@ void QWorkerModule::yield()
 {
     v8::Unlocker unlocker;
     QThread::yieldCurrentThread();
+
+    QMetaObject::invokeMethod(this, "yield", Qt::QueuedConnection);
 }
 
 void QJSWorkerThread::run() {

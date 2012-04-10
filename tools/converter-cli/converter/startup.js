@@ -3,6 +3,7 @@ var eventbus = require("eventbus"); /* Eventbus */
 var worker = require("worker"); /* Worker */
 var buffer = require("buffer");
 var vfs = require("vfs");
+var scheduling = require("scheduling");
 
 exports.startup = function(guiRoot) {
 
@@ -13,7 +14,9 @@ exports.startup = function(guiRoot) {
     guiRoot.pathChooser.path = vfs.guessGamePath();
     guiRoot.pathChooser.ok.connect(function() {
         guiRoot.state = "conversion";
-        require("conversion").run(guiRoot.pathChooser.path + "/");
+        scheduling.defer(function() {
+            require("conversion").run(guiRoot.pathChooser.path + "/");
+        });
     });
 
     /*
