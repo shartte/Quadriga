@@ -1,8 +1,6 @@
 #ifndef ZIPWRITER_H
 #define ZIPWRITER_H
 
-#include "minizipglobal.h"
-
 #include <QString>
 #include <QScopedPointer>
 

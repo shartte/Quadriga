@@ -6,7 +6,7 @@
 #include <QString>
 
 class QCommonJSModule;
-class ZipArchive;
+class ZipWriter;
 
 class ConversionOutput: public QObject
 {
@@ -58,7 +58,7 @@ private:
 
     QHash<QString, QString> mCategoryArchiveMap;
     QHash<QString, QDir> mCategoryDirectoryMap;
-    QHash<QString, ZipArchive*> mArchiveMap;
+    QHash<QString, ZipWriter*> mArchiveMap;
     
 };
 

@@ -41,9 +41,14 @@ exports.run = function() {
     var tasks = filesToConvert.map(function (path) {
         return function() {
             var mat = convertMaterial(path);
+
+            if (!mat) {
+                return;
+            }
+
             for (var i = 0; i < material.Material.TextureStageCount; ++i) {
                 var ts = mat.textureStage(i);
-                if (ts.filename && texturesToCopy.indexOf(filename) === -1) {
+                if (ts.filename && texturesToCopy.indexOf(ts.filename) === -1) {
                     texturesToCopy.push(ts.filename);
                 }
             }

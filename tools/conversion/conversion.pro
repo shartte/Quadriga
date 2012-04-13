@@ -46,3 +46,5 @@ DEPENDPATH += $$PWD/../../scripting
 win32:CONFIG(release, debug|release): PRE_TARGETDEPS += $$OUT_PWD/../../scripting/release/scripting.lib
 else:win32:CONFIG(debug, debug|release): PRE_TARGETDEPS += $$OUT_PWD/../../scripting/debug/scripting.lib
 else:unix:!symbian: PRE_TARGETDEPS += $$OUT_PWD/../../scripting/libscripting.a
+
+include($$PWD/minizip/minizip.pri)
