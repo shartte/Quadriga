@@ -59,4 +59,9 @@ OTHER_FILES += \
     converter/gui/gui.qml \
     converter/gui/Conversion.qml \
     converter/gui/Button.qml \
-    converter/conversion/util.js
+    converter/conversion/util.js \
+    converter/control.js \
+    converter/conversion/materials.js \
+    converter/plan.js \
+    converter/plan.js \
+    converter/conversion/material.js

@@ -18,7 +18,8 @@ SOURCES += \
     qbuffermodule.cpp \
     v8_buffer.cpp \
     qstdlibmodule.cpp \
-    qschedulingmodule.cpp
+    qschedulingmodule.cpp \
+    qjsexceptionutils.cpp
 
 HEADERS += \
     qcommonjsmodule.h \
@@ -30,7 +31,8 @@ HEADERS += \
     qstdlibmodule.h \
     qvfsmodule.h \
     gamepathguesser.h \
-    qschedulingmodule.h
+    qschedulingmodule.h \
+    qjsexceptionutils.h
 
 unix {
     target.path = /usr/lib

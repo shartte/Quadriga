@@ -43,7 +43,6 @@ private:
     QHash<QString, QJSValue> mModuleCache;
 
     QJSValue mRequireFunction;
-    QJSValue mModuleWrapper;
 };
 
 #endif // QCOMMONJSMODULE_H

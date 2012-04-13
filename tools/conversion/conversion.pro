@@ -11,12 +11,12 @@ TARGET = conversion
 TEMPLATE = lib
 CONFIG += staticlib create_prl
 
-SOURCES += conversion.cpp \
+SOURCES += \
     qvfsmodule.cpp \
     imagemodule.cpp \
     conversionoutput.cpp
 
-HEADERS += conversion.h \
+HEADERS += \
     stable.h \
     qvfsmodule.h \
     imagemodule.h \

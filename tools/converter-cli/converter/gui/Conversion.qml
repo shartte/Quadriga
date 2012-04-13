@@ -45,15 +45,25 @@ Item {
         height: 1
     }
 
-    Text {
+    ListModel {
+        id: logEntries
+    }
+
+    ListView {
         id: logWindow
+        clip: true
+
         anchors.top: separator.bottom
         anchors.left: parent.left
         anchors.right: parent.right
         anchors.bottom: parent.bottom
         anchors.margins: 20
-        color: "#dddddd"
-        text: ""
+
+        model: logEntries
+        delegate: Text {
+            text: getLevel(level) + message
+            color: "#ffffff"
+        }
     }
 
     function getLevel(level) {
@@ -79,9 +89,8 @@ Item {
     Component.onCompleted: {
         console.log("Subscribing to event bus.");
         eventbus.subscribe("log", function (channel, message) {
-            console.log("Hey. Got a nice message!");
-            logWindow.text += getLevel(message.level) + message.message + "<br>";
-            console.log(message);
+            logEntries.append(message);
+            logWindow.positionViewAtEnd();
         });
         eventbus.subscribe("progress", function (channel, message) {
             progressBar.progress = message.progress;

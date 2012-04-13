@@ -5,17 +5,14 @@
 
 #include "qcommonjsmodule.h"
 
+static const char *wrapperScript = "(function(require, exports, module, moduleText) {\n"
+        "var wrapper = new Function('require', 'exports', 'module', moduleText);\n"
+        "wrapper.call({}, require, exports, module);\n"
+        "})";
+
 QCommonJSModule::QCommonJSModule(QJSEngine *engine, const QDir &scriptDir)
     : QObject(engine), mEngine(engine), mScriptDir(scriptDir), mCurrentModuleDir("")
 {
-
-    const char *wrapperScript = "(function(require, exports, module, moduleText) {\n"
-            "var wrapper = new Function('require', 'exports', 'module', moduleText);\n"
-            "wrapper.call({}, require, exports, module);\n"
-            "})";
-
-    mModuleWrapper = engine->evaluate(wrapperScript);
-
     if (engine->hasUncaughtException()) {
         QJSValue e = engine->uncaughtException();
         qDebug() << "Unable to create the CommonJS wrapper function." << e.toString();
@@ -47,7 +44,8 @@ void QCommonJSModule::addModuleFromScript(const QString &moduleId, const QString
     module.setProperty("uri", filename);
     module.setProperty("exports", exports);
 
-    mModuleWrapper.call(QJSValueList() << mRequireFunction << exports << module << QJSValue(script));
+    QJSValue moduleWrapper = mEngine->evaluate(wrapperScript, filename, 0);
+    moduleWrapper.call(QJSValueList() << mRequireFunction << exports << module << QJSValue(script));
 
     if (mEngine->hasUncaughtException()) {
         QJSValue uncaughtException = mEngine->uncaughtException();
@@ -91,7 +89,8 @@ QJSValue QCommonJSModule::require(QString id)
         module.setProperty("uri", filename);
         module.setProperty("exports", exports);
 
-        mModuleWrapper.call(QJSValueList() << mRequireFunction << exports << module << QJSValue(script));
+        QJSValue moduleWrapper = mEngine->evaluate(wrapperScript, filename, 0);
+        moduleWrapper.call(QJSValueList() << mRequireFunction << exports << module << QJSValue(script));
 
         if (mEngine->hasUncaughtException()) {
             QJSValue uncaughtException = mEngine->uncaughtException();

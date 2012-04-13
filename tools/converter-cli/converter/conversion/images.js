@@ -99,6 +99,6 @@ exports.run = function() {
         });
     });
 
-    scheduling.defer(executionPlan);
+    return executionPlan;
 
 };

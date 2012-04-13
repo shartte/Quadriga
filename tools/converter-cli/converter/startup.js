@@ -41,6 +41,5 @@ exports.startup = function(guiRoot) {
             vfs.addDefaultArchives(gamePath);
         }
     }
-
-*/
+    */
 };

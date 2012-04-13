@@ -1,6 +1,7 @@
 #include <QtDebug>
 
 #include "qschedulingmodule.h"
+#include "qjsexceptionutils.h"
 
 QSchedulingModule::QSchedulingModule(QJSEngine *engine) :
     QObject(engine), mEngine(engine)
@@ -12,8 +13,7 @@ void QSchedulingModule::doCall(QJSValue callback)
     callback.call();
 
     if (mEngine->hasUncaughtException()) {
-        qDebug() << "Deferred callback caused unhandeled exception:" << mEngine->uncaughtException().toString();
-        mEngine->clearExceptions();
+        QJSExceptionUtils::handleUnhandledException(mEngine);
     }
 }
 
@@ -32,6 +32,7 @@ void QSchedulingModule::doSequenceCall(QJSValue sequence, QJSValue lastResult, i
     if (mEngine->hasUncaughtException()) {
         qDebug() << "While processing callback sequence an error occured @"
                  << index << ":" << mEngine->uncaughtException().toString();
+        QJSExceptionUtils::handleUnhandledException(mEngine);
         return;
     }
 
