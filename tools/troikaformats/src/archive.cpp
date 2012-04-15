@@ -123,7 +123,7 @@ const TroikaArchiveEntry *TroikaArchive::findEntry(QString path) const
 
     int section = 0;
     while (current) {
-        QString pathPart = path.section('/', section, section);
+        QString pathPart = path.section('/', section, section, flags);
         section++;
 
         if (pathPart.isEmpty())
@@ -165,9 +165,28 @@ QByteArray TroikaArchive::readEntry(const TroikaArchiveEntry *entry)
     }
 }
 
-QByteArray TroikaArchive::readRawFile(const QString &filename, bool &compressed, long &uncompressedSize)
+QByteArray TroikaArchive::readRawFile(const QString &filename, bool &compressed, int &uncompressedSize)
 {
+    const TroikaArchiveEntry *entry = findEntry(filename);
+
+    if (entry && !entry->isDirectory()) {
+        return readRawEntry(entry, compressed, uncompressedSize);
+    }
+
     return QByteArray();
+}
+
+QByteArray TroikaArchive::readRawEntry(const TroikaArchiveEntry *entry, bool &compressed, int &uncompressedSize)
+{
+    Q_ASSERT(!entry->isDirectory());
+
+    QMutexLocker locker(&mReadMutex);
+    mFile.seek(entry->dataStart);
+
+    // Decompress if needed
+    compressed = entry->isCompressed();
+    uncompressedSize = entry->uncompressedSize;
+    return mFile.read(entry->isCompressed() ? entry->compressedSize : entry->uncompressedSize);
 }
 
 bool TroikaArchive::exists(const QString &filename) const

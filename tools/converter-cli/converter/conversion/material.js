@@ -8,6 +8,9 @@ var vfs = require("vfs"),
 function Material(path) {
     this.path = path;
     this.textureStages = [];
+    this.specularPower = 50;
+    this.color = [1, 1, 1, 1];
+    this.blendType = "alpha";
 
     for (var i = 0; i < Material.TextureStageCount; ++i) {
         this.textureStages[i] = {
@@ -94,7 +97,7 @@ function processCommand(path, material, command, args) {
         material.glossMap = args[0];
         break;
     case "colorfillonly":
-        material.depthTestDisabled = true;
+        material.depthWriteDisabled = true;
         break;
     case "blendtype":
         if (args.length !== 2)
@@ -196,7 +199,7 @@ function processCommand(path, material, command, args) {
         if (args.length !== 4)
             throw new Error("Invalid color command found in " + path);
 
-        material.color = [args.map(function (s) { return s / 255.0; })]
+        material.color = args.map(function (s) { return s / 255.0; });
         break;
 
     default:

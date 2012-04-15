@@ -4,6 +4,7 @@ var worker = require("worker"); /* Worker */
 var buffer = require("buffer");
 var vfs = require("vfs");
 var scheduling = require("scheduling");
+var modelConverter = require("native/modelconverter");
 
 exports.startup = function(guiRoot) {
 

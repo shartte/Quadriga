@@ -9,6 +9,7 @@
 #include "qbuffermodule.h"
 
 #include "troikaformats/archive.h"
+#include "qjsexceptionutils.h"
 
 QVfsModule::QVfsModule(QCommonJSModule *commonJsModule) :
     QObject(commonJsModule), mCommonJsModule(commonJsModule), mEngine(commonJsModule->engine())
@@ -139,8 +140,30 @@ QJSValue QVfsModule::readFile(const QString &path)
     return QJSValue();
 }
 
+QJSValue QVfsModule::readFileRaw(const QString &path)
+{
+    foreach (TroikaArchive *archive, mArchives) {
+        bool compressed = false;
+        int uncompressedSize = 0;
+        QByteArray content = archive->readRawFile(path, compressed, uncompressedSize);
+        if (!content.isNull()) {
+            QJSValue buffer = QBufferModule::newBuffer(mCommonJsModule, content);
+
+            QJSValue result = mEngine->newObject();
+            result.setProperty("compressed", compressed);
+            result.setProperty("buffer", buffer);
+            result.setProperty("uncompressedSize", uncompressedSize);
+            return result;
+        }
+    }
+
+    return QJSExceptionUtils::newError(mEngine, "File not found: " + path);
+
+}
+
 QJSValue QVfsModule::listAllFiles(const QString &filenameFilter) const
 {
+
     QSet<QString> paths;
 
     foreach (TroikaArchive *archive, mArchives) {
@@ -148,6 +171,44 @@ QJSValue QVfsModule::listAllFiles(const QString &filenameFilter) const
         foreach (auto entry, entries) {
             paths.insert(entry->fullPath());
         }
+    }
+
+    QJSValue result = mEngine->newArray(paths.size());
+    int offset = 0;
+    foreach (const QString &path, paths) {
+        result.setProperty(offset++, QJSValue(path));
+    }
+
+    return result;
+
+}
+
+QJSValue QVfsModule::listDirectory(const QString &directory) const
+{
+
+    bool found = false;
+    QSet<QString> paths;
+
+    QString basePath = directory;
+    if (!basePath.endsWith(QDir::separator()))
+        basePath.append(QDir::separator());
+
+    foreach (TroikaArchive *archive, mArchives) {
+        auto entry = archive->findEntry(directory);
+        if (entry) {
+            found = true;
+
+            for (auto child = entry->firstChild; child; child = child->nextSibling) {
+                if (!child->isDirectory()) {
+                    paths.insert(basePath + child->filename);
+                }
+            }
+        }
+    }
+
+    // None of the archives contained the directory.
+    if (!found) {
+        return QJSExceptionUtils::newError(mEngine, QString("Could not find directory: %1").arg(directory));
     }
 
     QJSValue result = mEngine->newArray(paths.size());

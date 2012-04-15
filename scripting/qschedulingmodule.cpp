@@ -1,4 +1,5 @@
 #include <QtDebug>
+#include <QMetaObject>
 
 #include "qschedulingmodule.h"
 #include "qjsexceptionutils.h"

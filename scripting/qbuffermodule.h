@@ -10,6 +10,8 @@ class QBufferModule
 public:
     static void install(QCommonJSModule *commonJsModule);
 
+    static bool isBuffer(const QJSValue &buffer);
+
     static QJSValue newBuffer(QCommonJSModule *commonJsModule, const QByteArray &data);
 
     static QByteArray getData(const QJSValue &buffer);

@@ -38,7 +38,13 @@ public:
       Reads a potentially compressed file from the archive but does not
       decompress it.
       */
-    QByteArray readRawFile(const QString &filename, bool &compressed, long &uncompressedSize);
+    QByteArray readRawFile(const QString &filename, bool &compressed, int &uncompressedSize);
+
+    /**
+      Reads a potentially compressed file from the archive but does not
+      decompress it.
+      */
+    QByteArray readRawEntry(const TroikaArchiveEntry *entry, bool &compressed, int &uncompressedSize);
 
     /**
       Checks that a given file exists within the archive.

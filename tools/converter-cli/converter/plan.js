@@ -27,9 +27,9 @@ Plan.prototype.run = function(finishCallback) {
         var result = nextElement();
         if (result instanceof Array) {
             log.trace("Adding {} more plan elements after running plan element.", result.length);
-            result.forEach(function (newTask) {
-                self.elements.unshift(newTask);
-            });
+            for (var i = result.length - 1; i >= 0; i--) {
+                self.elements.unshift(result[i]);
+            }
         }
 
         scheduling.defer(runStep);

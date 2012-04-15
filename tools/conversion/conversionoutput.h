@@ -45,6 +45,17 @@ public slots:
     QJSValue addBuffer(const QString &category, const QString &filename, const QJSValue &buffer);
 
     /**
+     * @brief Adds a JS buffer to the conversion output that may already be precompressed.
+     * @param category The conversion output category. This determines where the file will be written (or which archive it will be written to).
+     * @param filename The filename for the buffer.
+     * @param buffer The buffer to write.
+     * @param compressed
+     * @param uncompressedSize
+     * @return
+     */
+    QJSValue addRawBuffer(const QString &category, const QString &filename, const QJSValue &buffer, bool compressed, int uncompressedSize);
+
+    /**
      * @brief UTF-8 encodes a string and adds it to the conversion output.
      * @param category The conversion output category. This determines where the file will be written (or which archive it will be written to).
      * @param filename The filename of the file that will contain the written string.

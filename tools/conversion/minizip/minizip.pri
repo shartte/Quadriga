@@ -1,7 +1,6 @@
 HEADERS += $$PWD/crypt.h \
 		   $$PWD/ioapi.h \
-		   $$PWD/iowin32.h \
-		   $$PWD/unzip.h \
+                   $$PWD/iowin32.h \
 		   $$PWD/zconf.h \
 		   $$PWD/zip.h \
 		   $$PWD/zipwriter.h \

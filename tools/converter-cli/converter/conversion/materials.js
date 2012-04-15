@@ -2,32 +2,29 @@
 var vfs = require("vfs"),
     log = require("log"),
     scheduling = require("scheduling"),
-    material = require("conversion/material");
-
-var exclusions = [
-    "art/clip/"
-];
-
-function isExcluded(path) {
-    var excludedPath;
-    for (var i = 0; i < exclusions.length; ++i) {
-        excludedPath = exclusions[i];
-        if (path.indexOf(excludedPath) === 0)
-            return true;
-    }
-    return false;
-}
+    material = require("conversion/material"),
+    output = require("conversion/output"),
+    exclusions = require("conversion/exclusions"),
+    ogreMaterialWriter = require("conversion/ogrematerial");
 
 function convertMaterial(path) {
 
-    if (isExcluded(path)) {
+    if (exclusions.isExcluded(path)) {
         log.info("Skipping {}", path);
         return;
     }
 
     log.trace("Converting material {}", path);
-
     return material.parseMaterial(path);
+}
+
+function copyTexture(texture) {
+    var buffer = vfs.readFile(texture);
+    if (!buffer) {
+        log.warn("Texture not found: {}", texture);
+    } else {
+        output.addBuffer("textures", texture, buffer);
+    }
 }
 
 exports.run = function() {
@@ -38,13 +35,19 @@ exports.run = function() {
 
     var texturesToCopy = [];
 
-    var tasks = filesToConvert.map(function (path) {
-        return function() {
+    var tasks = [];
+
+    filesToConvert.forEach(function (path) {
+        tasks.push(function() {
             var mat = convertMaterial(path);
 
             if (!mat) {
                 return;
             }
+
+            var ogreMaterial = ogreMaterialWriter.createOgreMaterial(mat);
+            path = path.replace(".mdf", ".material");
+            output.addString("materials", path, ogreMaterial);
 
             for (var i = 0; i < material.Material.TextureStageCount; ++i) {
                 var ts = mat.textureStage(i);
@@ -52,12 +55,17 @@ exports.run = function() {
                     texturesToCopy.push(ts.filename);
                 }
             }
-        }
+        });
     });
 
     // Convert textures
     tasks.push(function() {
-        log.info("Found {} textures in total.", texturesToCopy.length)
+        log.info("Copying {} textures.", texturesToCopy.length);
+        return texturesToCopy.map(function (texture) {
+            return function() {
+                copyTexture(texture);
+            };
+        });
     });
 
     return tasks;

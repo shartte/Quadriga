@@ -28,6 +28,12 @@ void QBufferModule::install(QCommonJSModule *commonJsModule)
 
 }
 
+bool QBufferModule::isBuffer(const QJSValue &buffer)
+{
+    v8::Handle<v8::Value> bufferObject = *QJSValuePrivate::get(buffer);
+    return Buffer::HasInstance(bufferObject);
+}
+
 QJSValue QBufferModule::newBuffer(QCommonJSModule *commonJsModule, const QByteArray &data)
 {
     auto bufferModule = commonJsModule->require("buffer");

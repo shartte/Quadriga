@@ -14,13 +14,24 @@ CONFIG += staticlib create_prl
 SOURCES += \
     qvfsmodule.cpp \
     imagemodule.cpp \
-    conversionoutput.cpp
+    conversionoutput.cpp \
+    ogremodelconverter.cpp \
+    ogresystems.cpp \
+    modelconverter.cpp \
+    clippingconverter.cpp \
+    submeshsplitter.cpp
 
 HEADERS += \
     stable.h \
     qvfsmodule.h \
     imagemodule.h \
-    conversionoutput.h
+    conversionoutput.h \
+    ogremodelconverter.h \
+    clippingconverter.h \
+    ogresystems.h \
+    modelconverter.h \
+    clippingconverter.h \
+    submeshsplitter.h
 
 PRECOMPILED_HEADER = stable.h
 
@@ -46,5 +57,7 @@ DEPENDPATH += $$PWD/../../scripting
 win32:CONFIG(release, debug|release): PRE_TARGETDEPS += $$OUT_PWD/../../scripting/release/scripting.lib
 else:win32:CONFIG(debug, debug|release): PRE_TARGETDEPS += $$OUT_PWD/../../scripting/debug/scripting.lib
 else:unix:!symbian: PRE_TARGETDEPS += $$OUT_PWD/../../scripting/libscripting.a
+
+include($$PWD/../../thirdparty/ogre.pri)
 
 include($$PWD/minizip/minizip.pri)

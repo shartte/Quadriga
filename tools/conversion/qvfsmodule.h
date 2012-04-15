@@ -65,9 +65,23 @@ public slots:
     QJSValue readFile(const QString &path);
 
     /**
+     * @brief Reads a file as a buffer, but does not decompress it, if it is compressed already.
+     * @param path The path of the file to ready.
+     * @return An object that contains three properties. One is named "buffer" and contains the buffer with the file data,
+     *         while the other is named "compressed" and is a flag whether the buffer contains zlib compressed data.
+     *         The third is "uncompressedSize", which contains the size of the data when it is uncompressed.
+     */
+    QJSValue readFileRaw(const QString &path);
+
+    /**
       Returns a list of all files in the virtual file system, filtered using the given filename filter.
       */
     QJSValue listAllFiles(const QString &filenameFilter) const;
+
+    /**
+      Returns a list of all files in the given directory and applies the given filename filter.
+      */
+    QJSValue listDirectory(const QString &directory) const;
 
 private:
     QJSEngine *mEngine;

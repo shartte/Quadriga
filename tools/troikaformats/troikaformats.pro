@@ -1,6 +1,4 @@
 
-QT       -= gui
-
 TARGET = troikaformats
 TEMPLATE = lib
 CONFIG += staticlib
@@ -8,20 +6,26 @@ CONFIG += staticlib
 DEFINES += TROIKAFORMATS_LIBRARY
 
 HEADERS += \
-    include/troikaformats/materialfile.h \
-    include/troikaformats/materialdefinition.h \
     include/troikaformats/archive.h \
     include/troikaformats/color.h \
     include/troikaformats/archiveentry.h \
     include/troikaformats/gamepathguesser.h \
     src/stable.h \
-    src/materialcommand.h \
-    include/troikaformats/targaimage.h
+    include/troikaformats/targaimage.h \
+    include/troikaformats/skeleton.h \
+    include/troikaformats/model.h \
+    include/troikaformats/util.h \
+    include/troikaformats/constants.h \
+    include/troikaformats/skmreader.h \
+    include/troikaformats/dagreader.h
 
 SOURCES += \
-    src/materialfile.cpp \
     src/archive.cpp \
-    src/targaimage.cpp
+    src/targaimage.cpp \
+    src/skeleton.cpp \
+    src/model.cpp \
+    src/skmreader.cpp \
+    src/dagreader.cpp
 
 win32:SOURCES += src/gamepathguesser_win32.cpp
 else:SOURCES += src/gamepathguesser.cpp

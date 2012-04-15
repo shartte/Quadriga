@@ -64,4 +64,10 @@ OTHER_FILES += \
     converter/conversion/materials.js \
     converter/plan.js \
     converter/plan.js \
-    converter/conversion/material.js
+    converter/conversion/material.js \
+    converter/conversion/mesparser.js \
+    converter/conversion/meshes.js \
+    converter/conversion/exclusions.js \
+    converter/conversion/ogrematerial.js \
+    converter/conversion/maptiles.js \
+    converter/conversion/depthart.js

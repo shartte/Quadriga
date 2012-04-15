@@ -13,10 +13,12 @@
 #include "qstdlibmodule.h"
 #include "qworkermodule.h"
 #include "qschedulingmodule.h"
+#include "qjsexceptionutils.h"
 
 #include "imagemodule.h"
 #include "qvfsmodule.h"
 #include "conversionoutput.h"
+#include "modelconverter.h"
 
 int main(int argc, char *argv[])
 {
@@ -38,7 +40,10 @@ int main(int argc, char *argv[])
     QBufferModule::install(&commonJsModule);
     QStdLibModule::install(&commonJsModule);
 
+    OgreSystems ogreSystems;
+
     QWorkerModule *workerModule = new QWorkerModule(quickView.engine());
+    commonJsModule.addNativeModule("native/modelconverter", new ModelConverter(&commonJsModule, &ogreSystems));
     commonJsModule.addNativeModule("eventbus", &eventBus);
     commonJsModule.addNativeModule("worker", workerModule);
     commonJsModule.addNativeModule("vfs", new QVfsModule(&commonJsModule));
@@ -49,6 +54,8 @@ int main(int argc, char *argv[])
     /* Call startup() method on the startup module */
     QJSValue startupModule = commonJsModule.require("startup");
     startupModule.property("startup").call(QJSValueList() << quickView.engine()->newQObject(rootItem));
+
+    QJSExceptionUtils::handleUnhandledException(quickView.engine());
 
     return a.exec();
 }
